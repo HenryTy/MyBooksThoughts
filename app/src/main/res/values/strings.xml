@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyBooksThoughts</string>
+    <string name="read_books_title">Read books</string>
 </resources>

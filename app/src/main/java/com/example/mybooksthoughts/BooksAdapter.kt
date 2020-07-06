@@ -22,7 +22,11 @@ class BooksAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val itemView = holder.mView
-        itemView.titleTextView.text = booksList[position].title
+        val book = booksList[position]
+        itemView.titleTextView.text = book.title
+        itemView.authorTextView.text = book.getAuthorsText()
+        val downloadImageTask = DownloadImageTask(itemView.coverImageView)
+        downloadImageTask.execute(book.imageUrl)
     }
 
     override fun getItemCount(): Int = booksList.size
