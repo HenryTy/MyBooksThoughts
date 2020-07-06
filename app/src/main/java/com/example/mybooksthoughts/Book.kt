@@ -1,6 +1,7 @@
 package com.example.mybooksthoughts
 
 import com.google.api.services.books.model.Volume
+import java.io.Serializable
 
 class Book(val id: String,
            val title: String,
@@ -9,7 +10,7 @@ class Book(val id: String,
            val pageCount: Int?,
            val averageRating: Double?,
            val ratingCount: Int?,
-           val imageUrl: String?) {
+           val imageUrl: String?): Serializable {
 
     companion object {
         fun createFromVolume(volume: Volume): Book {

@@ -1,5 +1,6 @@
 package com.example.mybooksthoughts
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +28,14 @@ class BooksAdapter(
         itemView.authorTextView.text = book.getAuthorsText()
         val downloadImageTask = DownloadImageTask(itemView.coverImageView)
         downloadImageTask.execute(book.imageUrl)
+        itemView.setOnClickListener { showBookDetails(book) }
     }
 
     override fun getItemCount(): Int = booksList.size
+
+    private fun showBookDetails(book: Book) {
+        val intent = Intent(activity, BookDetailsActivity::class.java)
+        intent.putExtra(BookDetailsActivity.BOOK_INTENT, book)
+        activity.startActivity(intent)
+    }
 }
