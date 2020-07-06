@@ -2,6 +2,7 @@ package com.example.mybooksthoughts
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
 class TokenManager {
 
@@ -12,9 +13,19 @@ class TokenManager {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString(BOOKS_TOKEN_KEY, token).apply()
         }
 
-        fun getToken(context: Context): String? {
+        fun getToken(context: Context, googleAccount: GoogleSignInAccount, callback: (String) -> (Unit)) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            return sharedPreferences.getString(BOOKS_TOKEN_KEY, null)
+            val token = sharedPreferences.getString(BOOKS_TOKEN_KEY, null)
+            if(token == null) {
+                val getTokenTask =
+                    GetTokenTask { accessToken ->
+                        saveToken(context, accessToken)
+                        callback.invoke(accessToken) }
+                getTokenTask.execute(googleAccount)
+            }
+            else {
+                callback.invoke(token)
+            }
         }
 
         fun removeToken(context: Context) {

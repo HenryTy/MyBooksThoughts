@@ -1,8 +1,5 @@
 package com.example.mybooksthoughts
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,10 +44,5 @@ class SearchBooksActivity : AppCompatActivity(), DownloadCallback<Volumes> {
                 adapter = BooksAdapter(bookList, this@SearchBooksActivity)
             }
         }
-    }
-
-    override fun getActiveNetworkInfo(): NetworkInfo {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return connectivityManager.activeNetworkInfo
     }
 }

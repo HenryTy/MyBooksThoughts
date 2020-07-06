@@ -24,10 +24,17 @@ class BooksAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val itemView = holder.mView
         val book = booksList[position]
-        itemView.titleTextView.text = book.title
+        if(book.title != null) {
+            itemView.titleTextView.text = book.title
+        }
+        else {
+            itemView.titleTextView.text = ""
+        }
         itemView.authorTextView.text = book.getAuthorsText()
-        val downloadImageTask = DownloadImageTask(itemView.coverImageView)
-        downloadImageTask.execute(book.imageUrl)
+        if(book.imageUrl != null) {
+            val downloadImageTask = DownloadImageTask(itemView.coverImageView)
+            downloadImageTask.execute(book.imageUrl)
+        }
         itemView.setOnClickListener { showBookDetails(book) }
     }
 
