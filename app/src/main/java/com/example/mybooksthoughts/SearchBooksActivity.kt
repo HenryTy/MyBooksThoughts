@@ -1,6 +1,7 @@
 package com.example.mybooksthoughts
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -13,14 +14,63 @@ import kotlinx.android.synthetic.main.activity_search_books.*
 
 class SearchBooksActivity : AppCompatActivity(), DownloadCallback<Volumes> {
 
+    companion object {
+        val STATE_INDEX = "index"
+        val STATE_QUERY = "query"
+    }
+
+    var currentBookStartIndex: Long = 0
+    var currentQuery: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_books)
 
-        searchButton.setOnClickListener { searchBooks(searchEditText.text.toString()) }
+        booksRecycler.layoutManager = LinearLayoutManager(this)
+
+        searchButton.setOnClickListener {
+            val newQuery = searchEditText.text.toString()
+            if(newQuery.trim() != "") {
+                currentQuery = newQuery
+                currentBookStartIndex = 0
+                searchBooks()
+            }
+        }
+
+        prevPageButton.setOnClickListener {
+            if(currentBookStartIndex >= 10) {
+                currentBookStartIndex -= 10
+                searchBooks()
+            }
+        }
+
+        nextPageButton.setOnClickListener {
+            currentBookStartIndex += 10
+            searchBooks()
+        }
     }
 
-    private fun searchBooks(query: String) {
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.run {
+            putLong(STATE_INDEX, currentBookStartIndex)
+            putString(STATE_QUERY, currentQuery)
+        }
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState.run {
+            currentBookStartIndex = getLong(STATE_INDEX)
+            currentQuery = getString(STATE_QUERY) ?: ""
+        }
+        if(currentQuery != "") {
+            searchBooks()
+        }
+    }
+
+    private fun searchBooks() {
+        showProgressBar()
         val books =
             Books.Builder(
                     NetHttpTransport(),
@@ -28,8 +78,8 @@ class SearchBooksActivity : AppCompatActivity(), DownloadCallback<Volumes> {
                     null)
                 .setGoogleClientRequestInitializer(BooksRequestInitializer(Keys.API_KEY))
                 .build()
-        val volumesListReq = books.volumes().list(query)
-        val downloadTask = DownloadTask<Volumes>(this)
+        val volumesListReq = books.volumes().list(currentQuery).setStartIndex(currentBookStartIndex)
+        val downloadTask = DownloadTask(this)
         downloadTask.execute(volumesListReq)
     }
 
@@ -40,9 +90,31 @@ class SearchBooksActivity : AppCompatActivity(), DownloadCallback<Volumes> {
                 bookList.add(Book.createFromVolume(volume))
             }
             with(booksRecycler) {
-                layoutManager = LinearLayoutManager(context)
                 adapter = BooksAdapter(bookList, this@SearchBooksActivity)
             }
+            setPagesButtonsVisibility(result.totalItems)
+        }
+    }
+
+    private fun showProgressBar() {
+        progressView.visibility = View.VISIBLE
+        prevPageButton.visibility = View.INVISIBLE
+        nextPageButton.visibility = View.INVISIBLE
+    }
+
+    private fun setPagesButtonsVisibility(totalItems: Int) {
+        progressView.visibility = View.GONE
+        if(currentBookStartIndex == 0L) {
+            prevPageButton.visibility = View.INVISIBLE
+        }
+        else {
+            prevPageButton.visibility = View.VISIBLE
+        }
+        if(currentBookStartIndex + 10 >= totalItems) {
+            nextPageButton.visibility = View.INVISIBLE
+        }
+        else {
+            nextPageButton.visibility = View.VISIBLE
         }
     }
 }

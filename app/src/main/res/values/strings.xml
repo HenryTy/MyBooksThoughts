@@ -5,4 +5,7 @@
     <string name="remove_from_read">Remove from read</string>
     <string name="added">Added</string>
     <string name="removed">Removed</string>
+    <string name="search">Search</string>
+    <string name="prev_page">Previous page</string>
+    <string name="next_page">Next page</string>
 </resources>

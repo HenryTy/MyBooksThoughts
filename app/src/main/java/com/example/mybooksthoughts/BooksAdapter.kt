@@ -32,8 +32,12 @@ class BooksAdapter(
         }
         itemView.authorTextView.text = book.getAuthorsText()
         if(book.imageUrl != null) {
+            itemView.coverImageView.visibility = View.VISIBLE
             val downloadImageTask = DownloadImageTask(itemView.coverImageView)
             downloadImageTask.execute(book.imageUrl)
+        }
+        else {
+            itemView.coverImageView.visibility = View.GONE
         }
         itemView.setOnClickListener { showBookDetails(book) }
     }
