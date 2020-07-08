@@ -7,29 +7,29 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 class TokenManager {
 
     companion object {
-        private val BOOKS_TOKEN_KEY = "BOOKS_TOKEN"
+        private val REFRESH_TOKEN_KEY = "REFRESH_TOKEN_"
 
-        fun saveToken(context: Context, token: String) {
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(BOOKS_TOKEN_KEY, token).apply()
+        private fun saveRefreshToken(context: Context, token: String, googleAccount: GoogleSignInAccount) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(
+                userTokenKey(googleAccount), token).apply()
         }
 
         fun getToken(context: Context, googleAccount: GoogleSignInAccount, callback: (String) -> (Unit)) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val token = sharedPreferences.getString(BOOKS_TOKEN_KEY, null)
-            if(token == null) {
-                val getTokenTask =
-                    GetTokenTask { accessToken ->
-                        saveToken(context, accessToken)
-                        callback.invoke(accessToken) }
-                getTokenTask.execute(googleAccount)
-            }
-            else {
-                callback.invoke(token)
-            }
+            val refreshToken = sharedPreferences.getString(userTokenKey(googleAccount), null)
+            val isFirstRequest = refreshToken == null
+            val getTokenTask =
+                GetTokenTask(!isFirstRequest) { tokenResponse ->
+                    if(isFirstRequest) {
+                        saveRefreshToken(context, tokenResponse.refreshToken, googleAccount)
+                    }
+                    callback.invoke(tokenResponse.accessToken) }
+            val userToken = if(isFirstRequest) googleAccount.serverAuthCode else refreshToken
+            getTokenTask.execute(userToken)
         }
 
-        fun removeToken(context: Context) {
-            PreferenceManager.getDefaultSharedPreferences(context).edit().remove(BOOKS_TOKEN_KEY).apply()
+        private fun userTokenKey(googleAccount: GoogleSignInAccount): String {
+            return REFRESH_TOKEN_KEY + googleAccount.id
         }
     }
 }

@@ -53,11 +53,6 @@ class MainActivity : AppCompatActivity() {
         updateUI(googleAccount)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        TokenManager.removeToken(this)
-    }
-
     private fun signIn() {
         val signInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -68,7 +63,6 @@ class MainActivity : AppCompatActivity() {
             .addOnCompleteListener(this) {
                 signInButton.visibility = View.VISIBLE
                 signOutButton.visibility = View.GONE
-                TokenManager.removeToken(this)
             }
     }
 
