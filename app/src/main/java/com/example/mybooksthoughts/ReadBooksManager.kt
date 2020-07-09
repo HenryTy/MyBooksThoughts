@@ -1,6 +1,7 @@
 package com.example.mybooksthoughts
 
 import android.content.Context
+import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -41,39 +42,47 @@ object ReadBooksManager {
                     }
                 }
                 callback.invoke(bookList)
-            })
+            }, false)
     }
 
     fun addBookToRead(book: Book, context: Context,
                       googleAccount: GoogleSignInAccount,
-                      callback: (Void?) -> (Unit)) {
+                      callback: () -> (Unit)) {
         makeRequest(context, googleAccount,
             {books ->  books.mylibrary().bookshelves().addVolume("4", book.id)},
-            {v -> callback.invoke(v) })
+            { callback.invoke() }, true)
     }
 
     fun removeBookFromRead(book: Book, context: Context,
                       googleAccount: GoogleSignInAccount,
-                      callback: (Void?) -> (Unit)) {
+                      callback: () -> (Unit)) {
         makeRequest(context, googleAccount,
             {books ->  books.mylibrary().bookshelves().removeVolume("4", book.id)},
-            {v -> callback.invoke(v) })
+            { callback.invoke() }, true)
     }
 
     private fun <T> makeRequest(context: Context,
                                 googleAccount: GoogleSignInAccount,
                                 requestCreator: (Books) -> (BooksRequest<T>),
-                                resultCallback: (T?) -> (Unit)) {
+                                resultCallback: (T?) -> (Unit),
+                                showNoConnectionMsg: Boolean) {
         TokenManager.getToken(context, googleAccount) { accessToken ->
-            makeRequestWithAccessToken(context, accessToken, requestCreator, resultCallback) }
+            makeRequestWithAccessToken(context, accessToken, requestCreator,
+                resultCallback, showNoConnectionMsg) }
     }
 
     private fun <T> makeRequestWithAccessToken(context: Context,
                                                accessToken: String?,
                                                requestCreator: (Books) -> (BooksRequest<T>),
-                                               resultCallback: (T?) -> (Unit)) {
+                                               resultCallback: (T?) -> (Unit),
+                                               showNoConnectionMsg: Boolean) {
         if(accessToken == null) {
-            resultCallback.invoke(null)
+            if(showNoConnectionMsg) {
+                Toast.makeText(context, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
+            }
+            else {
+                resultCallback.invoke(null)
+            }
             return
         }
         val books: Books = Books.Builder(
@@ -85,6 +94,15 @@ object ReadBooksManager {
         val downloadTask = DownloadTask(context, object : DownloadCallback<T> {
             override fun updateFromDownload(result: T?) {
                 resultCallback.invoke(result)
+            }
+
+            override fun onNoConnection() {
+                if(showNoConnectionMsg) {
+                    Toast.makeText(context, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    resultCallback.invoke(null)
+                }
             }
         })
         downloadTask.execute(req)

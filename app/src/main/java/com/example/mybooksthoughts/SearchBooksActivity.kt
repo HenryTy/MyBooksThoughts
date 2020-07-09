@@ -85,9 +85,6 @@ class SearchBooksActivity : AppCompatActivity(), DownloadCallback<Volumes> {
     }
 
     override fun updateFromDownload(result: Volumes?) {
-        if(result == null) {
-            Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
-        }
         var totalItems = 0
         val bookList = mutableListOf<Book>()
         if(result != null && result.totalItems > 0 && result.items != null) {
@@ -96,6 +93,15 @@ class SearchBooksActivity : AppCompatActivity(), DownloadCallback<Volumes> {
             }
             totalItems = result.totalItems
         }
+        showBookList(bookList, totalItems)
+    }
+
+    override fun onNoConnection() {
+        Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
+        showBookList(listOf(), 0)
+    }
+
+    private fun showBookList(bookList: List<Book>, totalItems: Int) {
         with(booksRecycler) {
             adapter = BooksAdapter(bookList, this@SearchBooksActivity)
         }

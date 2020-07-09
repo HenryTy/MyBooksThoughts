@@ -1,7 +1,6 @@
 package com.example.mybooksthoughts
 
 import android.content.Context
-import android.net.ConnectivityManager
 import android.os.AsyncTask
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest
 
@@ -19,12 +18,8 @@ class DownloadTask<T>(val context: Context, callback: DownloadCallback<T>)
     }
 
     override fun onPreExecute() {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo
-        if (networkInfo?.isConnected == false
-            || networkInfo?.type != ConnectivityManager.TYPE_WIFI
-            && networkInfo?.type != ConnectivityManager.TYPE_MOBILE) {
-            callback?.updateFromDownload(null)
+        if (!NetworkState.isConnected) {
+            callback?.onNoConnection()
             cancel(true)
         }
     }
@@ -46,4 +41,5 @@ class DownloadTask<T>(val context: Context, callback: DownloadCallback<T>)
 
 interface DownloadCallback<T> {
     fun updateFromDownload(result: T?)
+    fun onNoConnection()
 }

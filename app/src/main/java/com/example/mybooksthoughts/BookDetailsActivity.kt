@@ -92,27 +92,17 @@ class BookDetailsActivity : AppCompatActivity() {
 
     private fun changeReadStatus() {
         if(isRead) {
-            ReadBooksManager.removeBookFromRead(book,this, googleAccount) { v ->
-                if(v != null) {
-                    Toast.makeText(this, R.string.removed, Toast.LENGTH_SHORT).show()
-                    showAddToReadButton()
-                    isRead = false
-                }
-                else {
-                    Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
-                }
+            ReadBooksManager.removeBookFromRead(book,this, googleAccount) {
+                Toast.makeText(this, R.string.removed, Toast.LENGTH_SHORT).show()
+                showAddToReadButton()
+                isRead = false
             }
         }
         else {
-            ReadBooksManager.addBookToRead(book,this, googleAccount) { v ->
-                if(v != null) {
-                    Toast.makeText(this, R.string.added, Toast.LENGTH_SHORT).show()
-                    showRemoveFromReadButton()
-                    isRead = true
-                }
-                else {
-                    Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
-                }
+            ReadBooksManager.addBookToRead(book,this, googleAccount) {
+                Toast.makeText(this, R.string.added, Toast.LENGTH_SHORT).show()
+                showRemoveFromReadButton()
+                isRead = true
             }
         }
     }
