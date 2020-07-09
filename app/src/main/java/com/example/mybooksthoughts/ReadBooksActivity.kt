@@ -3,6 +3,7 @@ package com.example.mybooksthoughts
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -53,7 +54,13 @@ class ReadBooksActivity : AppCompatActivity() {
 
     private fun requestReadBooks() {
         ReadBooksManager.requestReadBooks(this, googleAccount) {books ->
-            showReadBooks(books)
+            if(books != null) {
+                showReadBooks(books)
+            }
+            else {
+                Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
+                showReadBooks(listOf())
+            }
         }
     }
 

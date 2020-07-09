@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -33,8 +34,11 @@ class BookDetailsActivity : AppCompatActivity() {
         val googleAccountIfSigned = GoogleSignIn.getLastSignedInAccount(this)
         if(googleAccountIfSigned != null) {
             googleAccount = googleAccountIfSigned
+            checkIfIsRead()
         }
-        checkIfIsRead()
+        else {
+            changeReadStatusButton.visibility = View.GONE
+        }
 
         changeReadStatusButton.setOnClickListener { changeReadStatusOrAskForPermission() }
     }
@@ -88,17 +92,27 @@ class BookDetailsActivity : AppCompatActivity() {
 
     private fun changeReadStatus() {
         if(isRead) {
-            ReadBooksManager.removeBookFromRead(book,this, googleAccount) {
-                Toast.makeText(this, R.string.removed, Toast.LENGTH_SHORT).show()
-                showAddToReadButton()
-                isRead = false
+            ReadBooksManager.removeBookFromRead(book,this, googleAccount) { v ->
+                if(v != null) {
+                    Toast.makeText(this, R.string.removed, Toast.LENGTH_SHORT).show()
+                    showAddToReadButton()
+                    isRead = false
+                }
+                else {
+                    Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
         else {
-            ReadBooksManager.addBookToRead(book,this, googleAccount) {
-                Toast.makeText(this, R.string.added, Toast.LENGTH_SHORT).show()
-                showRemoveFromReadButton()
-                isRead = true
+            ReadBooksManager.addBookToRead(book,this, googleAccount) { v ->
+                if(v != null) {
+                    Toast.makeText(this, R.string.added, Toast.LENGTH_SHORT).show()
+                    showRemoveFromReadButton()
+                    isRead = true
+                }
+                else {
+                    Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

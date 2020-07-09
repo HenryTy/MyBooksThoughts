@@ -8,4 +8,5 @@
     <string name="search">Search</string>
     <string name="prev_page">Previous page</string>
     <string name="next_page">Next page</string>
+    <string name="no_connection_msg">Check internet connection</string>
 </resources>

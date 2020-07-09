@@ -2,6 +2,7 @@ package com.example.mybooksthoughts
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -79,21 +80,26 @@ class SearchBooksActivity : AppCompatActivity(), DownloadCallback<Volumes> {
                 .setGoogleClientRequestInitializer(BooksRequestInitializer(Keys.API_KEY))
                 .build()
         val volumesListReq = books.volumes().list(currentQuery).setStartIndex(currentBookStartIndex)
-        val downloadTask = DownloadTask(this)
+        val downloadTask = DownloadTask(this, this)
         downloadTask.execute(volumesListReq)
     }
 
     override fun updateFromDownload(result: Volumes?) {
+        if(result == null) {
+            Toast.makeText(this, R.string.no_connection_msg, Toast.LENGTH_SHORT).show()
+        }
+        var totalItems = 0
+        val bookList = mutableListOf<Book>()
         if(result != null && result.totalItems > 0 && result.items != null) {
-            val bookList = mutableListOf<Book>()
             for (volume in result.items) {
                 bookList.add(Book.createFromVolume(volume))
             }
-            with(booksRecycler) {
-                adapter = BooksAdapter(bookList, this@SearchBooksActivity)
-            }
-            setPagesButtonsVisibility(result.totalItems)
+            totalItems = result.totalItems
         }
+        with(booksRecycler) {
+            adapter = BooksAdapter(bookList, this@SearchBooksActivity)
+        }
+        setPagesButtonsVisibility(totalItems)
     }
 
     private fun showProgressBar() {

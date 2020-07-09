@@ -14,16 +14,21 @@ class TokenManager {
                 userTokenKey(googleAccount), token).apply()
         }
 
-        fun getToken(context: Context, googleAccount: GoogleSignInAccount, callback: (String) -> (Unit)) {
+        fun getToken(context: Context, googleAccount: GoogleSignInAccount, callback: (String?) -> (Unit)) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
             val refreshToken = sharedPreferences.getString(userTokenKey(googleAccount), null)
             val isFirstRequest = refreshToken == null
             val getTokenTask =
-                GetTokenTask(!isFirstRequest) { tokenResponse ->
-                    if(isFirstRequest) {
-                        saveRefreshToken(context, tokenResponse.refreshToken, googleAccount)
+                GetTokenTask(!isFirstRequest, context) { tokenResponse ->
+                    if(tokenResponse != null) {
+                        if (isFirstRequest) {
+                            saveRefreshToken(context, tokenResponse.refreshToken, googleAccount)
+                        }
+                        callback.invoke(tokenResponse.accessToken)
+                    } else {
+                        callback.invoke(null)
                     }
-                    callback.invoke(tokenResponse.accessToken) }
+                }
             val userToken = if(isFirstRequest) googleAccount.serverAuthCode else refreshToken
             getTokenTask.execute(userToken)
         }
