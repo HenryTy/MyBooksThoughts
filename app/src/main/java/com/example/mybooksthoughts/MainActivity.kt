@@ -37,19 +37,8 @@ class MainActivity : AppCompatActivity() {
             .requestServerAuthCode(Keys.CLIENT_ID)
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
-        signOutButton.visibility = View.GONE
         signInButton.setOnClickListener { signIn() }
-        signOutButton.setOnClickListener { signOut() }
-
-        readBooksButton.setOnClickListener {
-            val intent = Intent(this, ReadBooksActivity::class.java)
-            startActivity(intent)
-        }
-
-        searchBooksButton.setOnClickListener {
-            val intent = Intent(this, SearchBooksActivity::class.java)
-            startActivity(intent)
-        }
+        mGoogleSignInClient.signOut()
     }
 
     override fun onStart() {
@@ -64,13 +53,6 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    private fun signOut() {
-        mGoogleSignInClient.signOut()
-            .addOnCompleteListener(this) {
-                signInButton.visibility = View.VISIBLE
-                signOutButton.visibility = View.GONE
-            }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -93,9 +75,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateUI(account: GoogleSignInAccount?) {
         if(account != null) {
-            signInButton.visibility = View.GONE
-            signOutButton.visibility = View.VISIBLE
-            titleTextView.text = "Hello " + account.email
+            val intent = Intent(this, MenuActivity::class.java)
+            startActivity(intent)
         }
     }
 }
