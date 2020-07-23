@@ -5,9 +5,12 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.transition.Fade
 import android.util.Log
 import android.view.View
+import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityOptionsCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -26,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransition()
         setContentView(R.layout.activity_main)
 
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -76,7 +80,15 @@ class MainActivity : AppCompatActivity() {
     private fun updateUI(account: GoogleSignInAccount?) {
         if(account != null) {
             val intent = Intent(this, MenuActivity::class.java)
-            startActivity(intent)
+            startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
+        }
+    }
+
+    private fun enableTransition() {
+        with(window) {
+            requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+            exitTransition = Fade()
+            exitTransition.duration = 1000
         }
     }
 }
