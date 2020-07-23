@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableTransition()
         setContentView(R.layout.activity_main)
 
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -80,15 +79,8 @@ class MainActivity : AppCompatActivity() {
     private fun updateUI(account: GoogleSignInAccount?) {
         if(account != null) {
             val intent = Intent(this, MenuActivity::class.java)
-            startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
+            startActivity(intent)
         }
     }
 
-    private fun enableTransition() {
-        with(window) {
-            requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
-            exitTransition = Fade()
-            exitTransition.duration = 1000
-        }
-    }
 }
