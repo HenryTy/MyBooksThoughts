@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -27,10 +28,8 @@ class BookDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_details)
-
+        var editText = findViewById<EditText>(R.id.newNote)
         book = intent.getSerializableExtra("BOOK") as Book
-        titleTextView.text = book.title
-
         val googleAccountIfSigned = GoogleSignIn.getLastSignedInAccount(this)
         if(googleAccountIfSigned != null) {
             googleAccount = googleAccountIfSigned
@@ -41,6 +40,10 @@ class BookDetailsActivity : AppCompatActivity() {
         }
 
         changeReadStatusButton.setOnClickListener { changeReadStatusOrAskForPermission() }
+        newNoteButton.setOnClickListener {
+            DbHelper(this).saveNotes(book.id, editText.text.toString())
+            editText.setText("")
+        }
     }
 
     private fun checkIfIsRead() {
