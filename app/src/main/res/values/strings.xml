@@ -9,4 +9,7 @@
     <string name="prev_page">Previous page</string>
     <string name="next_page">Next page</string>
     <string name="no_connection_msg">Check internet connection</string>
+    <string name="read_books">Read books</string>
+    <string name="search_books">Search books</string>
+    <string name="sign_out">Sign out</string>
 </resources>
