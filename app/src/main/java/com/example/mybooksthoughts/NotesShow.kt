@@ -6,19 +6,15 @@ import kotlinx.android.synthetic.main.notes_show.*
 
 class NotesShow: AppCompatActivity() {
     lateinit var book: Book
-    companion object {
-        val BOOK_INTENT = "BOOK"
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.notes_show)
-        book = intent.getSerializableExtra("BOOK") as Book
+        book = intent.getSerializableExtra(BookDetailsActivity.BOOK_INTENT) as Book
         var arr = DbHelper(this).getNotes(book.id)
-        var notes_str = ""
-        var iter = arr.size - 1
-        for(i in 0..iter){
-            notes_str += arr[i] + System.lineSeparator()
+
+        with(notesRecycler) {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+            adapter = NotesAdapter(arr)
         }
-        showNotes.setText(notes_str)
     }
 }

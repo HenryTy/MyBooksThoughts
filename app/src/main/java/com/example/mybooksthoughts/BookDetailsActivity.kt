@@ -47,6 +47,7 @@ class BookDetailsActivity : AppCompatActivity() {
         newNoteButton.setOnClickListener {
             DbHelper(this).saveNotes(book.id, editText.text.toString())
             editText.setText("")
+            Toast.makeText(this, R.string.added, Toast.LENGTH_SHORT).show()
         }
         showDesc.setOnClickListener {
             val intent = Intent(this, DescriptionShow::class.java)
@@ -58,10 +59,16 @@ class BookDetailsActivity : AppCompatActivity() {
             intent.putExtra(BookDetailsActivity.BOOK_INTENT, book)
             startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
         }
-        titleText.setText(book.title)
+        if(book.title != null) {
+            titleText.setText(book.title)
+        }
         authorsText.setText(book.getAuthorsText())
-        pagenumText.setText(book.pageCount.toString())
-        ratingText.setText(book.averageRating.toString() + "(" + book.ratingCount.toString() + ")")
+        if(book.pageCount != null) {
+            pagenumText.setText(book.pageCount.toString())
+        }
+        if(book.averageRating != null) {
+            ratingText.setText(book.averageRating.toString() + "(" + book.ratingCount.toString() + ")")
+        }
     }
 
     private fun checkIfIsRead() {
