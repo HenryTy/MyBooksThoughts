@@ -50,10 +50,12 @@ class BookDetailsActivity : AppCompatActivity() {
         }
         showDesc.setOnClickListener {
             val intent = Intent(this, DescriptionShow::class.java)
+            intent.putExtra(BookDetailsActivity.BOOK_INTENT, book)
             startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
         }
         showNotes.setOnClickListener {
             val intent = Intent(this, NotesShow::class.java)
+            intent.putExtra(BookDetailsActivity.BOOK_INTENT, book)
             startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
         }
         titleText.setText(book.title)

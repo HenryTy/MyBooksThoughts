@@ -17,6 +17,8 @@
         <activity android:name=".SearchBooksActivity" />
         <activity android:name=".ReadBooksActivity" />
         <activity android:name=".MenuActivity" />
+        <activity android:name=".NotesShow" />
+        <activity android:name=".DescriptionShow" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

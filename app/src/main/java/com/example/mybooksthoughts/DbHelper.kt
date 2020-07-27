@@ -31,7 +31,7 @@ class DbHelper(context: Context): SQLiteOpenHelper(context, DB_NAME, null, DB_VE
     fun getNotes(id: String): MutableList<String>{
         val result: MutableList<String> = ArrayList()
         val db = readableDatabase
-        val cursor = db.rawQuery("Select * from " + Columns.name + " where " + Columns.book_id + " = " + id , null)
+        val cursor = db.rawQuery("Select * from " + Columns.name + " where " + Columns.book_id + " = '" + id + "'" , null)
         with(cursor){
             while(moveToNext()){
                 result.add(getString(getColumnIndex(Columns.note)))
