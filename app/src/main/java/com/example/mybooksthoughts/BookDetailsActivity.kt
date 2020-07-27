@@ -4,9 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.transition.Fade
 import android.view.View
+import android.view.Window
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.app.ActivityOptionsCompat
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.Scope
@@ -27,6 +30,7 @@ class BookDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransition()
         setContentView(R.layout.activity_book_details)
         var editText = findViewById<EditText>(R.id.newNote)
         book = intent.getSerializableExtra("BOOK") as Book
@@ -44,6 +48,18 @@ class BookDetailsActivity : AppCompatActivity() {
             DbHelper(this).saveNotes(book.id, editText.text.toString())
             editText.setText("")
         }
+        showDesc.setOnClickListener {
+            val intent = Intent(this, DescriptionShow::class.java)
+            startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
+        }
+        showNotes.setOnClickListener {
+            val intent = Intent(this, NotesShow::class.java)
+            startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(this).toBundle())
+        }
+        titleText.setText(book.title)
+        authorsText.setText(book.getAuthorsText())
+        pagenumText.setText(book.pageCount.toString())
+        ratingText.setText(book.averageRating.toString() + "(" + book.ratingCount.toString() + ")")
     }
 
     private fun checkIfIsRead() {
@@ -107,6 +123,13 @@ class BookDetailsActivity : AppCompatActivity() {
                 showRemoveFromReadButton()
                 isRead = true
             }
+        }
+    }
+    private fun enableTransition() {
+        with(window) {
+            requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+            exitTransition = Fade()
+            exitTransition.duration = 1000
         }
     }
 }
